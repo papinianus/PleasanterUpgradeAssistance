@@ -7,6 +7,9 @@ import {
 import { decompress } from 'https://deno.land/x/zip@v1.2.4/mod.ts';
 import { releaseZip, githubUrl } from './consts.ts';
 
+const newEnvTempDir = 'candidate';
+const pleasanter = 'pleasanter';
+
 export const mv = async (path: string) => {
   const uuid7 = v7();
   const backUpPath = join(path, '..', uuid7);
@@ -18,6 +21,13 @@ export const mv = async (path: string) => {
 
 export const mvBack = async (current: string, installPath: string) => {
   await Deno.rename(current, installPath);
+};
+
+export const promoteDir = async (dst: string) => {
+  const newEnv = join(dst).endsWith(newEnvTempDir)
+    ? join(dst, '..', pleasanter)
+    : dst;
+  await Deno.rename(dst, newEnv);
 };
 
 const dl = async (version: string, path: string) => {
@@ -46,7 +56,7 @@ const extract = async (zipPath: string, extractDir: string) => {
     Deno.exit(1);
   }
   console.info(`decompressed ${result} ${new Date().toISOString()}`);
-  const expectedDirInResult = join(result, 'pleasanter');
+  const expectedDirInResult = join(result, pleasanter);
   for await (const entry of Deno.readDir(expectedDirInResult)) {
     console.log(entry.name);
     await Deno.rename(
@@ -59,7 +69,7 @@ const extract = async (zipPath: string, extractDir: string) => {
 };
 
 export const prepareNew = async (version: string, path: string) => {
-  const extractDir = join(path, '..', 'candidate');
+  const extractDir = join(path, '..', newEnvTempDir);
   try {
     const target = await Deno.lstat(extractDir);
     if (target.isDirectory) {

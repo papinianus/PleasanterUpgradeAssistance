@@ -1,5 +1,5 @@
 import { init } from './config.ts';
-import { mv, prepareNew, mvBack } from './fileManipulator.ts';
+import { mv, prepareNew, mvBack, promoteDir } from './fileManipulator.ts';
 import { copyParameters } from './copy.ts';
 
 const { installPath: installDir, targetVersion: upgradeTarget } = await init(
@@ -11,6 +11,7 @@ try {
   dst = await prepareNew(upgradeTarget, installDir);
   src = await mv(installDir);
   await copyParameters(src, dst);
+  await promoteDir(dst);
 } catch (e) {
   if (e instanceof Error) {
     console.error(e.message);
