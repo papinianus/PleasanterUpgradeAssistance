@@ -48,16 +48,24 @@ const copyParam = async (src: string, dst: string) => {
     await writeJsonValue(srcFileName, dstFileName);
   }
 };
-
+const stripeBOM = (content: string) =>
+  content.charCodeAt(0) === 0xfeff ? content.slice(1) : content;
+const prependBOM = (content: string) =>
+  String.fromCharCode(0xfeff).concat(content);
 const writeJsonValue = async (srcFileName: string, dstFileName: string) => {
   try {
-    const src = JSON.parse(await Deno.readTextFile(srcFileName));
-    const dst = JSON.parse(await Deno.readTextFile(dstFileName));
+    const srcText = await Deno.readTextFile(srcFileName);
+    const dstText = await Deno.readTextFile(dstFileName);
+    const src = JSON.parse(stripeBOM(srcText));
+    const dst = JSON.parse(stripeBOM(dstText));
     const merged = Object.keys(dst).reduce(
       (a, c) => (src[c] === undefined ? a : { ...a, [c]: src[c] }),
       dst,
     );
-    await Deno.writeTextFile(dstFileName, JSON.stringify(merged, null, 4));
+    await Deno.writeTextFile(
+      dstFileName,
+      prependBOM(JSON.stringify(merged, null, 4)),
+    );
   } catch (e) {
     if (e instanceof Error) {
       console.error(e.message);
