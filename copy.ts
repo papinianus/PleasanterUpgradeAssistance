@@ -58,18 +58,40 @@ const writeJsonValue = async (srcFileName: string, dstFileName: string) => {
     const dstText = await Deno.readTextFile(dstFileName);
     const src = JSON.parse(stripeBOM(srcText));
     const dst = JSON.parse(stripeBOM(dstText));
-    const merged = Object.keys(dst).reduce(
-      (a, c) => (src[c] === undefined ? a : { ...a, [c]: src[c] }),
-      dst,
-    );
+    const merged = merge(src, dst);
     await Deno.writeTextFile(
       dstFileName,
       prependBOM(JSON.stringify(merged, null, 4)),
     );
   } catch (e) {
     if (e instanceof Error) {
+      console.error(`${srcFileName} -> ${dstFileName}`);
       console.error(e.message);
-      console.error(e.stack);
     }
   }
 };
+const merge = (src: any, dst: any) => {
+  if (src instanceof String || typeof src === 'string') {
+    return dst;
+  }
+  if (src instanceof Number || typeof src === 'number') {
+    return dst;
+  }
+  if (src instanceof Boolean || typeof src === 'boolean') {
+    return dst;
+  }
+  if (src === null) {
+    return dst;
+  }
+  if (Array.isArray(src)) {
+    return mergeArray(src, dst);
+  }
+  return mergeObject(src, dst);
+};
+const mergeObject = (src: any, dst: any) =>
+  Object.keys(dst).reduce(
+    (a, c) => (src[c] === undefined ? a : { ...a, [c]: src[c] }),
+    dst,
+  );
+const mergeArray = (src: Array<any>, dst: Array<any>): Array<any> =>
+  src.map((e: any, i) => merge(e, dst[i]));
