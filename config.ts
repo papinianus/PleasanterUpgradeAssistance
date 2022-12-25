@@ -1,5 +1,5 @@
-import { parse } from 'https://deno.land/std/flags/mod.ts';
-import { join } from 'https://deno.land/std/path/mod.ts';
+import { parse } from 'https://deno.land/std@0.170.0/flags/mod.ts';
+import { join } from 'https://deno.land/std@0.170.0/path/mod.ts';
 import { pleasanterDir, codeDefinerDir } from './consts.ts';
 
 export const init = async (args: string[]) => {

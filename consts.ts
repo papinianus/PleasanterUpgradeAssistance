@@ -1,4 +1,4 @@
-import { join } from 'https://deno.land/std/path/mod.ts';
+import { join } from 'https://deno.land/std@0.170.0/path/mod.ts';
 
 export const githubUrl = (version: string) =>
   `https://github.com/Implem/Implem.Pleasanter/releases/download/Pleasanter_${version}/Pleasanter_${version}.zip`;

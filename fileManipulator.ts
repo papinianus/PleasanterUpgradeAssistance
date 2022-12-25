@@ -1,7 +1,10 @@
 import { v7 } from 'https://deno.land/x/uuid7@v0.0.1/mod.ts';
-import { join } from 'https://deno.land/std/path/mod.ts';
-import { download, Destination } from 'https://deno.land/x/download/mod.ts';
-import { decompress } from 'https://deno.land/x/zip/mod.ts';
+import { join } from 'https://deno.land/std@0.170.0/path/mod.ts';
+import {
+  download,
+  Destination,
+} from 'https://deno.land/x/download@v1.0.1/mod.ts';
+import { decompress } from 'https://deno.land/x/zip@v1.2.4/mod.ts';
 import { releaseZip, githubUrl } from './consts.ts';
 
 export const mv = async (path: string) => {

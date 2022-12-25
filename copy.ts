@@ -1,6 +1,6 @@
 import { License, pleasanterDir, codeDefinerDir, paramsDir } from './consts.ts';
-import { copy } from 'https://deno.land/std/fs/mod.ts';
-import { join } from 'https://deno.land/std/path/mod.ts';
+import { copy } from 'https://deno.land/std@0.170.0/fs/mod.ts';
+import { join } from 'https://deno.land/std@0.170.0/path/mod.ts';
 
 export const copyParameters = async (src: string, dst: string) => {
   console.log(`start copy ${new Date().toISOString()}`);
