@@ -18,7 +18,7 @@ try {
     console.error(e.stack);
   }
   if (src !== '') {
-    console.log('roll back');
-    // mvBack(src, installDir);
+    console.info('roll back');
+    mvBack(src, installDir);
   }
 }
