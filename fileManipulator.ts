@@ -21,6 +21,7 @@ export const mvBack = async (current: string, installPath: string) => {
 };
 
 const dl = async (version: string, path: string) => {
+  console.info(`Download start ${new Date().toISOString()}`);
   const url = githubUrl(version);
   const dest: Destination = {
     dir: join(path, '..'),
@@ -28,6 +29,7 @@ const dl = async (version: string, path: string) => {
   };
   try {
     await download(url, dest);
+    console.info(`Download end ${new Date().toISOString()}`);
   } catch (e) {
     if (e instanceof Deno.errors.Http) {
       console.error(
@@ -37,8 +39,26 @@ const dl = async (version: string, path: string) => {
     }
   }
 };
+const extract = async (zipPath: string, extractDir: string) => {
+  const result = await decompress(zipPath, extractDir);
+  if (result === false) {
+    console.error('unzip error');
+    Deno.exit(1);
+  }
+  console.info(`decompressed ${result} ${new Date().toISOString()}`);
+  const expectedDirInResult = join(result, 'pleasanter');
+  for await (const entry of Deno.readDir(expectedDirInResult)) {
+    console.log(entry.name);
+    await Deno.rename(
+      join(expectedDirInResult, entry.name),
+      join(extractDir, entry.name),
+    );
+  }
+  await Deno.remove(expectedDirInResult);
+  return extractDir;
+};
 
-export const unzip = async (version: string, path: string) => {
+export const prepareNew = async (version: string, path: string) => {
   const extractDir = join(path, '..', 'candidate');
   try {
     const target = await Deno.lstat(extractDir);
@@ -59,17 +79,9 @@ export const unzip = async (version: string, path: string) => {
     }
   } catch (e) {
     if (e instanceof Deno.errors.NotFound) {
-      console.info(`Download start ${new Date().toISOString()}`);
       await dl(version, path);
-      console.info(`Download end ${new Date().toISOString()}`);
     }
   }
-  console.info(`decompressing ${extractDir} ${new Date().toISOString()}`);
-  const result = await decompress(releaseZip(version), join(extractDir));
-  if (result === false) {
-    console.error('unzip error');
-    Deno.exit(1);
-  }
-  console.info(`decompressed ${result} ${new Date().toISOString()}`);
+  const result = await extract(zipFile, extractDir);
   return result;
 };

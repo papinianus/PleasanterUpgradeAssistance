@@ -1,5 +1,5 @@
 import { init } from './config.ts';
-import { mv, unzip, mvBack } from './fileManipulator.ts';
+import { mv, prepareNew, mvBack } from './fileManipulator.ts';
 import { copyParameters } from './copy.ts';
 
 const { installPath: installDir, targetVersion: upgradeTarget } = await init(
@@ -8,8 +8,7 @@ const { installPath: installDir, targetVersion: upgradeTarget } = await init(
 let dst = '';
 let src = '';
 try {
-  dst = await unzip(upgradeTarget, installDir);
-  console.dir('??');
+  dst = await prepareNew(upgradeTarget, installDir);
   src = await mv(installDir);
   await copyParameters(src, dst);
 } catch (e) {
